@@ -10,6 +10,8 @@ local IMPORT = ("@import url('https://cfx-nui-%s/whip/hud.css'); @import url('ht
     :format(SELF, SELF)
 
 local function report(on, text)
+    -- every public whip_core (1.0.0 on) draws its minimap in its own page (#minimap3d), which whip/hud.css rounds
+    text = ('%s (whip_core %s)'):format(text, GetResourceMetadata('whip_core', 'version', 0) or '?')
     GlobalState.d11_hud_layer = { on = on, text = text, resource = SELF }
     print(('%s[d11_hud] %s^0'):format(on and '^2' or '^3', text))
 end
