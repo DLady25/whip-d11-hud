@@ -28,6 +28,15 @@ Whip.register(function()
         report(true, 'WHIP layer on: d11_hud is already WHIP\'s active theme.')
         return
     end
+    if theme == 'd11_theme' then
+        report(true, 'WHIP layer on: through d11_theme, which imports whip/hud.css and whip/status.css.')
+        return
+    end
+    if theme == 'whip_theme_d12' then
+        report(false, ('WHIP layer: "whip_theme_d12" is the active WHIP theme; the copy in the old D11 Starter Kit does not round the minimap. Replace it with d11_theme (github.com/DLady25/whip-d11-theme), which carries the layer, or add %s to its theme.css right after its own @import lines.')
+            :format(IMPORT))
+        return
+    end
     if theme ~= nil and theme ~= '' and theme ~= false then
         report(false, ('WHIP layer off: the WHIP theme "%s" is active (%s), so d11_hud cannot load its own. Add %s to that theme\'s theme.css, or WHIP\'s gauges and square minimap stay on screen.')
             :format(tostring(theme), owner and ('set by ' .. tostring(owner)) or 'Config.Theme', IMPORT))
