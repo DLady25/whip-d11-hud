@@ -1,6 +1,12 @@
-// The speedometer: RPM arc with a continuous fill, fuel on the outer right, nitrous as a thin arc inside the RPM one on
-// the left and turbo boost as its mirror on the right, with the psi centred under the speed. Aircraft use the same dial: heading in
-// the gear circle, knots as the big number, altitude/AGL below, the horizon behind and the climb rate on the left arc.
+// The speedometer, one SVG in a 180 x 180 box centred on (90, 90), so every arc and every text line is placed against
+// the same radii and nothing can spill over the face:
+//   74 ......... the face (and its rim at 73.5)
+//   66.25-70.75  the RPM band: 26 segments with real gaps, the lit ones revealed by a mask
+//   60.25-62.75  nitrous (left, filling upwards) and turbo boost (right, its mirror)
+//   58 ......... the inner ring; text stays within 56 of the centre (the chord is checked line by line)
+//   77.5-80.5 .. fuel (outside, right) and, for aircraft, the climb rate (outside, left)
+// Aircraft use the same dial: heading in the gear ring, knots as the big number, altitude and AGL under it, the
+// horizon behind.
 (() => {
     const root = document.getElementById('gauge');
     const ratio = value => Math.max(0, Math.min(1, Number(value) || 0));
@@ -26,6 +32,9 @@
         vs: '<path d="M8 20V4M4 8l4-4 4 4M16 4v16M12 16l4 4 4-4"/>',
     };
     const icon = name => `<svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${icons[name]}</svg>`;
+    // a 24 x 24 icon drawn inside the dial, `size` units wide, centred on (x, y)
+    const dialIcon = (name, cls, x, y, size) =>
+        `<g class="gi ${cls}" transform="translate(${x - size / 2} ${y - size / 2}) scale(${size / 24})">${icons[name]}</g>`;
 
     const point = (radius, angle) => [90 + radius * Math.cos(angle * Math.PI / 180), 90 + radius * Math.sin(angle * Math.PI / 180)];
     // clockwise from start to end (degrees, 0 = right, 90 = down)
@@ -38,48 +47,63 @@
         const a = point(radius, start), b = point(radius, end);
         return `M${a.join(',')}A${radius},${radius} 0 ${start - end > 180 ? 1 : 0} 0 ${b.join(',')}`;
     };
-    const rpmPath = arc(69, 140, 400);
-    const fuelPath = arc(81, -34, 35);
-    const nitroPath = arc(62.5, 142, 248);     // inside the RPM arc, from the same start
-    const turboPath = arcBack(62.5, 38, -68);  // its mirror on the right, from the RPM arc's end
-    const vsTrack = arc(81, 146, 214);       // the fuel arc's mirror, left side
+
+    const RPM_R = 68.5, RPM_FROM = 140, RPM_STEP = 10, RPM_SEGMENTS = 26, RPM_GAP = .7;
+    const rpmPath = arc(RPM_R, RPM_FROM, RPM_FROM + RPM_STEP * RPM_SEGMENTS);
+    const segment = i => arc(RPM_R, RPM_FROM + i * RPM_STEP + RPM_GAP, RPM_FROM + (i + 1) * RPM_STEP - RPM_GAP);
+    const segments = Array.from({ length: RPM_SEGMENTS }, (_, i) => i);
+    const rpmTrack = segments.map(i => `<path d="${segment(i)}"/>`).join('');
+    const rpmLit = segments.map(i =>
+        `<path class="g-rpm" d="${segment(i)}" style="stroke:${warningColor(i / (RPM_SEGMENTS - 1), .3, .65, .92)}"/>`).join('');
+
+    const fuelPath = arc(79, -30, 30);
+    const vsTrack = arc(79, 150, 210);       // the fuel arc's mirror, left side
+    const nitroPath = arc(61.5, 144, 246);    // inside the RPM band, from its start
+    const turboPath = arcBack(61.5, 36, -66); // the mirror on the right, from the RPM band's end
     const pitchLines = [-20, -10, 10, 20].map(p => {
         const y = 90 - p * 1.6, w = p % 20 ? 10 : 16;
-        return `<line x1="${90 - w}" x2="${90 + w}" y1="${y}" y2="${y}" stroke="#ffffff38" stroke-width=".8"/>`;
+        return `<line x1="${90 - w}" x2="${90 + w}" y1="${y}" y2="${y}"/>`;
     }).join('');
-    const rpmSegments = Array.from({ length: 26 }, (_, i) =>
-        `<path class="g-rpm" d="${arc(69, 140 + i * 10, 150 + i * 10)}" style="stroke:${warningColor(i / 25, .3, .65, .92)}"/>`).join('');
-    const ticks = Array.from({ length: 27 }, (_, i) => `<path d="${arc(69, 140 + i * 10, 141 + i * 10)}"/>`).join('');
     const INDICATORS = { gear: 'Trem de pouso', rotor: 'Rotor', lights: 'Faróis', belt: 'Cinto', lock: 'Travas', engine: 'Motor', nitro: 'Nitro' };
     const CAR_ONLY = ['belt', 'lock', 'nitro'];
     const CARDINAL = ['N', 'NE', 'L', 'SE', 'S', 'SO', 'O', 'NO'];
 
     root.innerHTML = `<div class="gauge" hidden>
         <svg class="g-dial" viewBox="0 0 180 180" aria-hidden="true">
-            <defs><mask id="g-rpm-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
-                <path class="g-reveal" d="${rpmPath}" pathLength="100" stroke="white" stroke-width="6" fill="none" style="stroke-dasharray:0 100"/>
-            </mask><clipPath id="g-clip"><circle cx="90" cy="90" r="58.5"/></clipPath>
-                <radialGradient id="g-face" cx="50%" cy="42%" r="58%"><stop offset="0" stop-color="#1b2128" stop-opacity=".78"/><stop offset="1" stop-color="#0c0f13" stop-opacity=".86"/></radialGradient></defs>
-            <circle class="g-back" cx="90" cy="90" r="73" fill="url(#g-face)"/>
-            <circle class="g-rim" cx="90" cy="90" r="72.5"/>
+            <defs>
+                <mask id="g-rpm-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
+                    <path class="g-reveal" d="${rpmPath}" pathLength="100" stroke="white" stroke-width="8" fill="none" style="stroke-dasharray:0 100"/>
+                </mask>
+                <clipPath id="g-clip"><circle cx="90" cy="90" r="57.5"/></clipPath>
+                <radialGradient id="g-face" cx="50%" cy="40%" r="60%">
+                    <stop offset="0" stop-color="#1c2229" stop-opacity=".8"/><stop offset="1" stop-color="#0b0e12" stop-opacity=".9"/>
+                </radialGradient>
+            </defs>
+            <circle class="g-back" cx="90" cy="90" r="74" fill="url(#g-face)"/>
+            <circle class="g-rim" cx="90" cy="90" r="73.5"/>
             <g class="g-horizon" clip-path="url(#g-clip)"><g class="g-hz">
                 <rect x="-110" y="-310" width="400" height="400" fill="#009CE4" fill-opacity=".2"/>
                 <rect x="-110" y="90" width="400" height="400" fill="#000" fill-opacity=".34"/>
-                <line x1="-110" x2="290" y1="90" y2="90" stroke="#ffffff70" stroke-width="1"/>${pitchLines}
+                <line class="g-hz-line" x1="-110" x2="290" y1="90" y2="90"/><g class="g-pitch">${pitchLines}</g>
             </g></g>
-            <circle class="g-inner" cx="90" cy="90" r="59"/>
-            <path class="g-rpm-track" d="${rpmPath}"/>
-            <g mask="url(#g-rpm-mask)">${rpmSegments}</g>
-            <g class="g-ticks">${ticks}</g>
+            <circle class="g-inner" cx="90" cy="90" r="58"/>
+            <g class="g-rpm-track">${rpmTrack}</g>
+            <g mask="url(#g-rpm-mask)">${rpmLit}</g>
             <g class="g-nitro-wrap"><path class="g-nitro-track" d="${nitroPath}"/><path class="g-nitro" d="${nitroPath}" pathLength="100" style="stroke-dasharray:0 100"/></g>
             <g class="g-turbo-wrap"><path class="g-turbo-track" d="${turboPath}"/><path class="g-turbo" d="${turboPath}" pathLength="100" style="stroke-dasharray:0 100"/>
-                <text class="g-boost" x="90" y="145"><tspan class="g-boost-n">0</tspan> <tspan>PSI</tspan></text></g>
+                <text class="g-txt g-boost" x="90" y="131"><tspan class="g-boost-n">0</tspan><tspan class="g-boost-u" dx="2">PSI</tspan></text></g>
             <g class="g-fuel-ring"><path class="g-fuel-track" d="${fuelPath}"/><path class="g-fuel" d="${fuelPath}" pathLength="100"/></g>
-            <g class="g-vs-wrap"><path class="g-vs-track" d="${vsTrack}"/><path class="g-vs"/><line x1="6" x2="12" y1="90" y2="90" stroke="#ffffff80" stroke-width="1"/></g>
+            ${dialIcon('fuel', 'g-fuel-icon', 177.5, 90, 12)}
+            <g class="g-vs-wrap"><path class="g-vs-track" d="${vsTrack}"/><path class="g-vs"/><line class="g-vs-zero" x1="8" x2="13" y1="90" y2="90"/></g>
+            ${dialIcon('vs', 'g-vs-icon', 2.5, 90, 12)}
+            <circle class="g-gear-ring" cx="90" cy="46" r="11"/>
+            <text class="g-txt g-gear" x="90" y="46.5">N</text>
+            <text class="g-txt g-gear-label" x="90" y="63">GEAR</text>
+            <text class="g-txt g-speed" x="90" y="92" transform="matrix(.8 0 0 1 18 0)">000</text>
+            <text class="g-txt g-unit" x="90" y="115">MPH</text>
+            <text class="g-txt g-alt g-air-only" x="90" y="128"></text>
+            <text class="g-txt g-agl g-air-only" x="90" y="139"></text>
         </svg>
-        <div class="g-readout"><span class="g-gear">N</span><span class="g-gear-label"></span><strong class="g-speed">000</strong><span class="g-unit">MPH</span><span class="g-alt"></span></div>
-        <span class="g-fuel-icon">${icon('fuel')}</span>
-        <span class="g-vs-icon">${icon('vs')}</span>
         <div class="g-warn"></div>
         <div class="g-ind">${Object.keys(INDICATORS).map(name =>
             `<span data-i="${name}">${icon(name)}${name === 'engine' || name === 'rotor' ? '<i class="g-meter"></i>' : ''}</span>`).join('')}</div>
@@ -87,6 +111,7 @@
 
     const el = root.querySelector('.gauge');
     const $ = s => el.querySelector(s);
+    const show = (s, on) => { $(s).style.display = on ? '' : 'none'; };
     let vehicle = { visible: false };
     let nitro = { visible: false, level: 0, burst: false };
     let turbo = { visible: false, psi: 0, max: 0 };
@@ -112,27 +137,26 @@
         $('.g-unit').textContent = v.unit || 'MPH';
         $('.g-gear').textContent = /^(R|N|D|[1-9][0-9]?)$/.test(String(v.gear)) ? v.gear : 'N';
         $('.g-gear-label').textContent = 'GEAR';
-        $('.g-alt').innerHTML = '';
         el.style.setProperty('--fuel-color', warningColor(1 - ratio(v.fuel), .6, .8, .9));
         el.style.setProperty('--engine-color', warningColor(v.checkEngine ? 1 : 1 - ratio(v.engineHealth), .3, .5, .7));
         // electric: no red band, one blue arc
         el.classList.toggle('electric', !!v.electric);
         $('.g-reveal').style.strokeDasharray = `${rpm * 100} 100`;
         $('.g-fuel').style.strokeDasharray = `${ratio(v.fuel) * 100} 100`;
-        $('.g-fuel-ring').style.display = v.fuelVisible ? '' : 'none';
-        $('.g-fuel-icon').hidden = !v.fuelVisible;
+        show('.g-fuel-ring', v.fuelVisible);
+        show('.g-fuel-icon', v.fuelVisible);
         el.classList.toggle('fuel-low', !!v.fuelVisible && ratio(v.fuel) <= .15);
 
         // nitrous: the inner left arc, bright while it burns
         const burst = nitro.burst === true;
-        $('.g-nitro-wrap').style.display = nitro.visible && !v.aircraft ? '' : 'none';
+        show('.g-nitro-wrap', nitro.visible && !v.aircraft);
         $('.g-nitro').style.strokeDasharray = `${ratio(nitro.level) * 100} 100`;
         $('.g-nitro').classList.toggle('burst', burst);
 
         // turbo: the inner right arc fills with boost up to the stage's full psi; vacuum leaves it empty
         const max = Number(turbo.max) || 0, psi = Number(turbo.psi) || 0;
         const boost = max > 0 ? ratio(psi / max) : 0;
-        $('.g-turbo-wrap').style.display = turbo.visible && !v.aircraft ? '' : 'none';
+        show('.g-turbo-wrap', turbo.visible && !v.aircraft);
         $('.g-turbo').style.strokeDasharray = `${boost * 100} 100`;
         $('.g-turbo').classList.toggle('full', boost >= .95);
         $('.g-boost-n').textContent = String(Math.round(psi));
@@ -173,13 +197,14 @@
         $('.g-unit').textContent = 'KT';
         $('.g-gear').textContent = a.direction || T(CARDINAL[Math.round(a.heading / 45) % 8]);
         $('.g-gear-label').textContent = T('RUMO');
-        $('.g-alt').innerHTML = `<b>${fmt(a.altitude)}</b> FT <i>·</i> AGL <b>${fmt(a.agl)}</b>`;
+        $('.g-alt').innerHTML = `<tspan class="g-n">${fmt(a.altitude)}</tspan><tspan class="g-u" dx="2">FT</tspan>`;
+        $('.g-agl').innerHTML = `AGL <tspan class="g-n">${fmt(a.agl)}</tspan>`;
         const pitch = Math.max(-30, Math.min(30, a.pitch));
         $('.g-hz').setAttribute('transform', `rotate(${-a.roll} 90 90) translate(0 ${pitch * 1.6})`);
 
         // climb rate: 2000 ft/min fills the arc; up goes up, down goes down
-        const ang = Math.max(-1, Math.min(1, a.vs / 2000)) * 34;
-        $('.g-vs').setAttribute('d', Math.abs(ang) < .5 ? '' : ang > 0 ? arc(81, 180, 180 + ang) : arc(81, 180 + ang, 180));
+        const ang = Math.max(-1, Math.min(1, a.vs / 2000)) * 30;
+        $('.g-vs').setAttribute('d', Math.abs(ang) < .5 ? '' : ang > 0 ? arc(79, 180, 180 + ang) : arc(79, 180 + ang, 180));
         const danger = a.airborne && a.agl < 300 && a.vs < -800;
         el.style.setProperty('--vs-color', danger ? '#ef655b' : ang >= 0 ? '#62c8f2' : '#edf1f4');
 

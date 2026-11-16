@@ -51,11 +51,11 @@
 #status-hud #capsuleInput { font-family: var(--ui-font); color: var(--d11-ink); caret-color: var(--ui-accent); }
 
 /* ---------- voice: one circle, its size is the range ----------
-   right 2rem, bottom 14.5rem; WHIP sends the range as --sh-p 20/50/100 (whisper/normal/shout). */
+   right 2rem, bottom 15.6rem (above d11_hud's speedometer, drawn at 1.15x); WHIP sends the range as --sh-p 20/50/100 (whisper/normal/shout). */
 #status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"] {
     position: fixed;
     right: calc(2 * var(--d11-u));
-    bottom: calc(14.5 * var(--d11-u));
+    bottom: calc(15.6 * var(--d11-u));
     width: calc(2.1 * var(--d11-u)) !important;
     height: calc(2.1 * var(--d11-u));
     margin: 0 !important;

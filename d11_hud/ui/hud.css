@@ -99,50 +99,52 @@ svg.ic { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-wid
 
 @media (prefers-reduced-motion: reduce) { .low, .orb.enter { animation: none; } }
 
-/* ---------- speedometer ---------- */
+/* ---------- speedometer (ui/gauge.js: one 180 x 180 SVG, radii listed there) ---------- */
 #gauge { right: 2rem; bottom: 1.5rem; }
-.gauge { position: relative; width: 14.5rem; height: 12rem; color: #f1f3f5; font-family: D11Display, sans-serif; font-weight: 700; filter: drop-shadow(0 1px 2px #0009); }
-.gauge[hidden], .g-ind > span[hidden], .g-fuel-icon[hidden] { display: none; }
+/* 1.15: a little bigger than 12rem; scaled from the bottom-right corner so it stays put */
+.gauge { position: relative; width: 14.5rem; height: 12rem; transform: scale(1.15); transform-origin: right bottom;
+    color: #f1f3f5; font-family: D11Display, sans-serif; font-weight: 700; filter: drop-shadow(0 1px 2px #0009); }
+.gauge[hidden], .g-ind > span[hidden] { display: none; }
 .g-dial { position: absolute; left: 0; top: 0; width: 12rem; height: 12rem; overflow: visible; fill: none; }
-.g-inner { stroke: #ffffff0d; stroke-width: .75; }
-.g-rim { stroke: #ffffff14; stroke-width: 1; }
-.g-rpm-track { stroke: #ffffff1f; stroke-width: 4; }
-.g-rpm { stroke-width: 4; }
+.g-rim { stroke: #ffffff17; stroke-width: 1; }
+.g-inner { stroke: #ffffff0f; stroke-width: .75; }
+.g-rpm-track { stroke: #ffffff1a; stroke-width: 4.5; }
+.g-rpm { stroke-width: 4.5; }
 .g-reveal { transition: stroke-dasharray 100ms linear; }
 .electric .g-rpm { stroke: #38d6e8 !important; }
-.g-ticks { stroke: #12161b; stroke-width: 4.6; }
 .g-fuel-track { stroke: #ffffff1c; stroke-width: 3; stroke-linecap: round; }
-.g-fuel { stroke: var(--fuel-color, #edf1f4); stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray 200ms linear, stroke 200ms linear; }
-/* nitrous: a thin arc inside the RPM one, on the left; turbo: the same on the right */
-.g-nitro-track { stroke: #ffffff10; stroke-width: 2.5; stroke-linecap: round; }
+.g-fuel { stroke: var(--fuel-color, #edf1f4); stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 200ms linear, stroke 200ms linear; }
+/* nitrous: a thin arc inside the RPM band, on the left; turbo: the same on the right */
+.g-nitro-track, .g-turbo-track { stroke: #ffffff12; stroke-width: 2.5; stroke-linecap: round; }
 .g-nitro { stroke: #38c4ea; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 1.5px #38c4ea80); transition: stroke-dasharray 120ms linear, stroke 120ms linear; }
 .g-nitro.burst { stroke: #9feeff; filter: drop-shadow(0 0 3px #62d8ff); }
-.g-turbo-track { stroke: #ffffff10; stroke-width: 2.5; stroke-linecap: round; }
 .g-turbo { stroke: #f7ca5c; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 1.5px #f7ca5c80); transition: stroke-dasharray 120ms linear; }
 .g-turbo.full { stroke: #ffe08a; filter: drop-shadow(0 0 3px #f7ca5c); }
-.g-boost { fill: #f7ca5c; font-size: 10.5px; font-style: italic; font-variant-numeric: tabular-nums; text-anchor: middle; }
-.g-boost tspan + tspan { font-size: 5.6px; letter-spacing: .14em; fill: #f1f3f5; fill-opacity: .6; font-style: normal; }
-@media (prefers-reduced-motion: reduce) { .g-turbo { transition: none; } }
-.g-readout { position: absolute; top: 1.85rem; left: 0; width: 12rem; display: flex; flex-direction: column; align-items: center; }
-.g-gear { display: grid; place-items: center; width: 1.85rem; height: 1.85rem; border: 1.5px solid #edf1f4d9; background: #ffffff08; border-radius: 50%; font-size: 1.02rem; font-style: italic; }
-.g-gear-label { font-size: .45rem; letter-spacing: .13em; opacity: .55; margin-top: .18rem; }
-.g-speed { font-size: 2.85rem; font-style: italic; line-height: 1.15; letter-spacing: -.06em; font-variant-numeric: tabular-nums; margin-top: .2rem; transform: scaleX(.8); }
-.g-unit { font-size: .6rem; letter-spacing: .11em; line-height: 1; }
-.g-fuel-icon { position: absolute; top: 5.5rem; left: 11.45rem; opacity: .9; color: var(--fuel-color, #edf1f4); transition: color 200ms linear; }
+/* the readout: SVG text in the dial's own units (1 unit = 12rem / 180) */
+.g-txt { fill: #f1f3f5; stroke: none; text-anchor: middle; dominant-baseline: central; font-family: D11Display, sans-serif; font-weight: 700; font-variant-numeric: tabular-nums; }
+.g-gear-ring { fill: #ffffff08; stroke: #edf1f4d0; stroke-width: 1.2; }
+.g-gear { font-size: 15px; font-style: italic; }
+.air .g-gear { font-size: 11px; }
+.g-gear-label { font-size: 6px; letter-spacing: .14em; fill-opacity: .55; }
+.g-speed { font-size: 41px; font-style: italic; letter-spacing: -.04em; }
+.g-unit { font-size: 8.5px; letter-spacing: .12em; }
+.g-boost { font-size: 11px; font-style: italic; fill: #f7ca5c; }
+.g-boost-u { font-size: 6px; font-style: normal; letter-spacing: .14em; fill: #f1f3f5; fill-opacity: .6; }
+.gi { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.g-fuel-icon { color: var(--fuel-color, #edf1f4); transition: color 200ms linear; }
 @keyframes g-blink { 50% { opacity: .2; } }
 .fuel-low .g-fuel, .fuel-low .g-fuel-icon { animation: g-blink 1.2s ease-in-out infinite; }
-svg.gi { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) { .g-reveal, .g-fuel, .g-nitro, .g-turbo, .g-fuel-icon { transition: none; } .fuel-low .g-fuel, .fuel-low .g-fuel-icon { animation: none; } }
+svg.gi { width: 1rem; height: 1rem; }
 .g-ind { position: absolute; top: 1.6rem; bottom: .5rem; right: 0; display: flex; flex-direction: column; justify-content: center; gap: .35rem; }
 .g-ind > span { width: 1.7rem; min-height: 1.7rem; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%;
     background: #101419b3; box-shadow: inset 0 0 0 1px #ffffff12; color: #ffffff59; transition: color 150ms linear, box-shadow 150ms linear; }
-.g-ind > .on { box-shadow: inset 0 0 0 1px #ffffff2e; }
-.g-ind > .on { color: #eef2f5; }
+.g-ind > .on { color: #eef2f5; box-shadow: inset 0 0 0 1px #ffffff2e; }
 .g-ind > .warning { color: #e9978e; }
 .g-ind > .blue { color: #7dc8ec; }
 .g-ind > [data-i="engine"] { color: var(--engine-color, #edf1f4); transition: color 200ms linear; }
 .g-ind .unlocked .shackle { transform: translateY(-2px) rotate(-24deg); transform-origin: 8px 10px; }
 .g-meter { width: .8rem; height: 2px; margin-top: .15rem; background: linear-gradient(to right, currentColor calc(var(--level, 0) * 100%), #ffffff20 0); }
-@media (prefers-reduced-motion: reduce) { .g-reveal, .g-fuel, .g-nitro, .g-fuel-icon { transition: none; } .fuel-low .g-fuel, .fuel-low .g-fuel-icon { animation: none; } }
 
 /* ---------- logo (D11Hud.Logo) ---------- */
 #brand { top: .5rem; right: 2rem; width: clamp(88px, 7vw, 132px); filter: drop-shadow(0 2px 3px #0008); }
@@ -186,14 +188,17 @@ svg.gi { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-wid
 #route small[hidden] { display: none; }
 
 /* ---------- speedometer: aircraft ---------- */
-.gauge:not(.air) .g-horizon, .gauge:not(.air) .g-vs-wrap, .gauge:not(.air) .g-vs-icon { display: none; }
-.g-vs-track { stroke: #ffffff25; stroke-width: 5; }
-.g-vs { stroke: var(--vs-color, #62c8f2); stroke-width: 5; }
-.g-vs-icon { position: absolute; top: 5.35rem; left: -1.05rem; color: var(--vs-color, #62c8f2); }
-.air .g-gear { font-size: .78rem; }
-.g-alt { margin-top: .28rem; font-size: .62rem; letter-spacing: .08em; font-variant-numeric: tabular-nums; opacity: .85; white-space: nowrap; }
-.g-alt b { font-size: .8rem; font-style: italic; letter-spacing: 0; }
-.g-alt i { font-style: normal; opacity: .55; }
+.gauge:not(.air) .g-horizon, .gauge:not(.air) .g-vs-wrap, .gauge:not(.air) .g-vs-icon, .gauge:not(.air) .g-air-only { display: none; }
+.g-hz-line { stroke: #ffffff70; stroke-width: 1; }
+.g-pitch line { stroke: #ffffff1f; stroke-width: .7; }
+.g-vs-track { stroke: #ffffff1c; stroke-width: 3; stroke-linecap: round; }
+.g-vs { stroke: var(--vs-color, #62c8f2); stroke-width: 3; stroke-linecap: round; }
+.g-vs-zero { stroke: #ffffff80; stroke-width: 1; }
+.g-vs-icon { color: var(--vs-color, #62c8f2); }
+.g-alt { font-size: 10px; }
+.g-alt .g-n { font-style: italic; }
+.g-alt .g-u, .g-agl { font-size: 6px; letter-spacing: .12em; fill-opacity: .7; }
+.g-agl .g-n { font-size: 7.5px; font-style: italic; letter-spacing: 0; fill-opacity: 1; }
 .g-ind > .alarm { color: var(--crit); animation: g-blink .7s ease-in-out infinite; }
 .g-warn { position: absolute; left: 0; width: 12rem; bottom: -.4rem; text-align: center; }
 .g-warn span { display: inline-block; font: italic 700 .7rem/1 D11Display, sans-serif; letter-spacing: .14em; padding: .25rem .6rem; border-radius: 99px; background: var(--crit); color: #fff; animation: g-blink .7s ease-in-out infinite; }
