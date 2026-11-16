@@ -40,8 +40,8 @@
     };
     const rpmPath = arc(69, 140, 400);
     const fuelPath = arc(81, -34, 35);
-    const nitroPath = arc(62, 140, 250);     // inside the RPM arc, from the same start
-    const turboPath = arcBack(62, 40, -70);  // its mirror on the right, from the RPM arc's end
+    const nitroPath = arc(62.5, 142, 248);     // inside the RPM arc, from the same start
+    const turboPath = arcBack(62.5, 38, -68);  // its mirror on the right, from the RPM arc's end
     const vsTrack = arc(81, 146, 214);       // the fuel arc's mirror, left side
     const pitchLines = [-20, -10, 10, 20].map(p => {
         const y = 90 - p * 1.6, w = p % 20 ? 10 : 16;
@@ -58,8 +58,10 @@
         <svg class="g-dial" viewBox="0 0 180 180" aria-hidden="true">
             <defs><mask id="g-rpm-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
                 <path class="g-reveal" d="${rpmPath}" pathLength="100" stroke="white" stroke-width="6" fill="none" style="stroke-dasharray:0 100"/>
-            </mask><clipPath id="g-clip"><circle cx="90" cy="90" r="58.5"/></clipPath></defs>
-            <circle class="g-back" cx="90" cy="90" r="73"/>
+            </mask><clipPath id="g-clip"><circle cx="90" cy="90" r="58.5"/></clipPath>
+                <radialGradient id="g-face" cx="50%" cy="42%" r="58%"><stop offset="0" stop-color="#1b2128" stop-opacity=".78"/><stop offset="1" stop-color="#0c0f13" stop-opacity=".86"/></radialGradient></defs>
+            <circle class="g-back" cx="90" cy="90" r="73" fill="url(#g-face)"/>
+            <circle class="g-rim" cx="90" cy="90" r="72.5"/>
             <g class="g-horizon" clip-path="url(#g-clip)"><g class="g-hz">
                 <rect x="-110" y="-310" width="400" height="400" fill="#009CE4" fill-opacity=".2"/>
                 <rect x="-110" y="90" width="400" height="400" fill="#000" fill-opacity=".34"/>
@@ -71,7 +73,7 @@
             <g class="g-ticks">${ticks}</g>
             <g class="g-nitro-wrap"><path class="g-nitro-track" d="${nitroPath}"/><path class="g-nitro" d="${nitroPath}" pathLength="100" style="stroke-dasharray:0 100"/></g>
             <g class="g-turbo-wrap"><path class="g-turbo-track" d="${turboPath}"/><path class="g-turbo" d="${turboPath}" pathLength="100" style="stroke-dasharray:0 100"/>
-                <text class="g-boost" x="90" y="151"><tspan class="g-boost-n">0</tspan> <tspan>PSI</tspan></text></g>
+                <text class="g-boost" x="90" y="145"><tspan class="g-boost-n">0</tspan> <tspan>PSI</tspan></text></g>
             <g class="g-fuel-ring"><path class="g-fuel-track" d="${fuelPath}"/><path class="g-fuel" d="${fuelPath}" pathLength="100"/></g>
             <g class="g-vs-wrap"><path class="g-vs-track" d="${vsTrack}"/><path class="g-vs"/><line x1="6" x2="12" y1="90" y2="90" stroke="#ffffff80" stroke-width="1"/></g>
         </svg>

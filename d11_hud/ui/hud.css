@@ -104,37 +104,38 @@ svg.ic { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-wid
 .gauge { position: relative; width: 14.5rem; height: 12rem; color: #f1f3f5; font-family: D11Display, sans-serif; font-weight: 700; filter: drop-shadow(0 1px 2px #0009); }
 .gauge[hidden], .g-ind > span[hidden], .g-fuel-icon[hidden] { display: none; }
 .g-dial { position: absolute; left: 0; top: 0; width: 12rem; height: 12rem; overflow: visible; fill: none; }
-.g-inner { stroke: #ffffff12; stroke-width: 1; }
-.g-back { fill: #10141966; }
-.g-rpm-track { stroke: #ffffff28; stroke-width: 4; }
+.g-inner { stroke: #ffffff0d; stroke-width: .75; }
+.g-rim { stroke: #ffffff14; stroke-width: 1; }
+.g-rpm-track { stroke: #ffffff1f; stroke-width: 4; }
 .g-rpm { stroke-width: 4; }
 .g-reveal { transition: stroke-dasharray 100ms linear; }
 .electric .g-rpm { stroke: #38d6e8 !important; }
-.g-ticks { stroke: #15181dc9; stroke-width: 7; }
-.g-fuel-track { stroke: #ffffff25; stroke-width: 5; }
-.g-fuel { stroke: var(--fuel-color, #edf1f4); stroke-width: 5; transition: stroke-dasharray 200ms linear, stroke 200ms linear; }
+.g-ticks { stroke: #12161b; stroke-width: 4.6; }
+.g-fuel-track { stroke: #ffffff1c; stroke-width: 3; stroke-linecap: round; }
+.g-fuel { stroke: var(--fuel-color, #edf1f4); stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray 200ms linear, stroke 200ms linear; }
 /* nitrous: a thin arc inside the RPM one, on the left; turbo: the same on the right */
-.g-nitro-track { stroke: #ffffff12; stroke-width: 3; }
-.g-nitro { stroke: #38c4ea; stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 2px #38c4eaaa); transition: stroke-dasharray 120ms linear, stroke 120ms linear; }
-.g-nitro.burst { stroke: #9feeff; filter: drop-shadow(0 0 4px #62d8ff); }
-.g-turbo-track { stroke: #ffffff12; stroke-width: 3; }
-.g-turbo { stroke: #f7ca5c; stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 2px #f7ca5caa); transition: stroke-dasharray 120ms linear; }
-.g-turbo.full { stroke: #ffe08a; filter: drop-shadow(0 0 4px #f7ca5c); }
-.g-boost { fill: #f7ca5c; font-size: 14px; font-style: italic; font-variant-numeric: tabular-nums; text-anchor: middle;
-    stroke: #101419cc; stroke-width: 2.5px; paint-order: stroke; }
-.g-boost tspan + tspan { font-size: 7.5px; letter-spacing: .12em; fill: #f1f3f5; fill-opacity: .8; font-style: normal; }
+.g-nitro-track { stroke: #ffffff10; stroke-width: 2.5; stroke-linecap: round; }
+.g-nitro { stroke: #38c4ea; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 1.5px #38c4ea80); transition: stroke-dasharray 120ms linear, stroke 120ms linear; }
+.g-nitro.burst { stroke: #9feeff; filter: drop-shadow(0 0 3px #62d8ff); }
+.g-turbo-track { stroke: #ffffff10; stroke-width: 2.5; stroke-linecap: round; }
+.g-turbo { stroke: #f7ca5c; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 1.5px #f7ca5c80); transition: stroke-dasharray 120ms linear; }
+.g-turbo.full { stroke: #ffe08a; filter: drop-shadow(0 0 3px #f7ca5c); }
+.g-boost { fill: #f7ca5c; font-size: 10.5px; font-style: italic; font-variant-numeric: tabular-nums; text-anchor: middle; }
+.g-boost tspan + tspan { font-size: 5.6px; letter-spacing: .14em; fill: #f1f3f5; fill-opacity: .6; font-style: normal; }
 @media (prefers-reduced-motion: reduce) { .g-turbo { transition: none; } }
-.g-readout { position: absolute; top: 2.1rem; left: 0; width: 12rem; display: flex; flex-direction: column; align-items: center; }
-.g-gear { display: grid; place-items: center; width: 1.85rem; height: 1.85rem; border: 1px solid #edf1f4; border-radius: 50%; font-size: 1.02rem; font-style: italic; }
+.g-readout { position: absolute; top: 1.85rem; left: 0; width: 12rem; display: flex; flex-direction: column; align-items: center; }
+.g-gear { display: grid; place-items: center; width: 1.85rem; height: 1.85rem; border: 1.5px solid #edf1f4d9; background: #ffffff08; border-radius: 50%; font-size: 1.02rem; font-style: italic; }
 .g-gear-label { font-size: .45rem; letter-spacing: .13em; opacity: .55; margin-top: .18rem; }
 .g-speed { font-size: 2.85rem; font-style: italic; line-height: 1.15; letter-spacing: -.06em; font-variant-numeric: tabular-nums; margin-top: .2rem; transform: scaleX(.8); }
 .g-unit { font-size: .6rem; letter-spacing: .11em; line-height: 1; }
-.g-fuel-icon { position: absolute; top: 5.35rem; left: 11.55rem; color: var(--fuel-color, #edf1f4); transition: color 200ms linear; }
+.g-fuel-icon { position: absolute; top: 5.5rem; left: 11.45rem; opacity: .9; color: var(--fuel-color, #edf1f4); transition: color 200ms linear; }
 @keyframes g-blink { 50% { opacity: .2; } }
 .fuel-low .g-fuel, .fuel-low .g-fuel-icon { animation: g-blink 1.2s ease-in-out infinite; }
 svg.gi { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .g-ind { position: absolute; top: 1.6rem; bottom: .5rem; right: 0; display: flex; flex-direction: column; justify-content: center; gap: .35rem; }
-.g-ind > span { width: 1.7rem; min-height: 1.65rem; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: #10141970; color: #ffffff55; }
+.g-ind > span { width: 1.7rem; min-height: 1.7rem; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%;
+    background: #101419b3; box-shadow: inset 0 0 0 1px #ffffff12; color: #ffffff59; transition: color 150ms linear, box-shadow 150ms linear; }
+.g-ind > .on { box-shadow: inset 0 0 0 1px #ffffff2e; }
 .g-ind > .on { color: #eef2f5; }
 .g-ind > .warning { color: #e9978e; }
 .g-ind > .blue { color: #7dc8ec; }
@@ -190,7 +191,7 @@ svg.gi { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-wid
 .g-vs { stroke: var(--vs-color, #62c8f2); stroke-width: 5; }
 .g-vs-icon { position: absolute; top: 5.35rem; left: -1.05rem; color: var(--vs-color, #62c8f2); }
 .air .g-gear { font-size: .78rem; }
-.g-alt { margin-top: .42rem; font-size: .62rem; letter-spacing: .08em; font-variant-numeric: tabular-nums; opacity: .85; white-space: nowrap; }
+.g-alt { margin-top: .28rem; font-size: .62rem; letter-spacing: .08em; font-variant-numeric: tabular-nums; opacity: .85; white-space: nowrap; }
 .g-alt b { font-size: .8rem; font-style: italic; letter-spacing: 0; }
 .g-alt i { font-style: normal; opacity: .55; }
 .g-ind > .alarm { color: var(--crit); animation: g-blink .7s ease-in-out infinite; }
