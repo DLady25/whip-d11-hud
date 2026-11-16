@@ -1,3 +1,5 @@
 /* d11_hud as a WHIP theme (server.lua: only when no other theme is active). Only the HUD layer, no tokens:
    WHIP's menus, inventory and notifications keep their own look. ?v=N: FiveM's NUI caches CSS by its address. */
-@import url('whip/hud.css?v=2');
+@import url('whip/hud.css?v=3');      /* WHIP's rev dial hidden, round minimap under the radar ring */
+@import url('whip/status.css?v=3');   /* WHIP's status gauges hidden, voice as a circle. Keeping WHIP's own gauges
+                                         (D11Hud.Status = false)? Delete this line. */

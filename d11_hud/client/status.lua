@@ -7,6 +7,7 @@
 -- Shown like WHIP's own status HUD: logged in, alive and no screen open.
 
 local POLL_MS = 200
+local SHOW = D11Hud.Status ~= false   -- false: WHIP's own gauges stay, d11_hud draws none
 
 local function pct(value)
     value = tonumber(value) or 0
@@ -61,7 +62,7 @@ CreateThread(function()
             Hud.set('active', active)
             if not active then last = nil end
         end
-        if active then
+        if active and SHOW then
             local status = readStatus()
             if changed(status, last) then
                 last = status

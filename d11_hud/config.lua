@@ -10,11 +10,14 @@ D11Hud = {
 
     SpeedUnit = 'mph',      -- 'mph' or 'kmh'
     Logo = false,           -- the D11 logo in the top-right corner (ui/logo.png: swap it for your own)
+    Status = true,          -- d11_hud's health/armour pills and stress/energy/oxygen orbs. false keeps WHIP's own
+                            -- gauges instead: also delete the whip/status.css line from theme.css (README)
 
     -- WHIP's own HUD: d11_hud hides WHIP's status gauges and 3D rev dial (it draws its own), keeps WHIP's voice
     -- gauge as a small circle and clips WHIP's minimap round under the radar ring. That is CSS inside whip_core's
-    -- page, so it goes in as a WHIP theme (whip/hud.css) when no other theme is active. Running your own theme?
-    -- Add @import url('https://cfx-nui-d11_hud/whip/hud.css'); to it and set this to false.
+    -- page, so it goes in as a WHIP theme (theme.css: whip/hud.css + whip/status.css) when no other theme is active.
+    -- Running your own theme? @import both files from it (README) and set this to false. The server console and F8
+    -- say which way it went, with a [d11_hud] line.
     WhipLayer = true,
 
     Radar = true,           -- the ring over WHIP's minimap: compass, heading, area and street

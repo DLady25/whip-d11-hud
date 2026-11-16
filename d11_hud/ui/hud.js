@@ -43,6 +43,7 @@
     on('active', active => document.documentElement.classList.toggle('inactive', active !== true));
     on('inventoryOpen', open => document.documentElement.classList.toggle('inventory-open', open === true));
     on('logo', show => { document.getElementById('brand').hidden = show !== true; });
+    on('showStatus', show => { document.getElementById('status').hidden = show === false; });
 
     window.addEventListener('message', ({ data }) => {
         if (!data || typeof data.action !== 'string') return;

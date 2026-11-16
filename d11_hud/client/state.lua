@@ -7,6 +7,7 @@ Hud = {
         inventoryOpen = false, -- WHIP's inventory already counts as an open screen
         locale = D11Hud.Locale,
         logo = D11Hud.Logo == true,
+        showStatus = D11Hud.Status ~= false,
         nitro = { visible = false, level = 0.0, burst = false },
         turbo = { visible = false, psi = 0.0, max = 0.0 },
     },

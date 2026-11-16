@@ -23,6 +23,7 @@ html, body {
 
 #hud { position: fixed; inset: 0; pointer-events: none; }
 #hud > .area { position: absolute; }
+#hud > .area[hidden] { display: none; }
 
 /* hidden HUD and an open inventory hide everything; separate flags, so closing the inventory does not
    undo a hidden HUD. */

@@ -34,13 +34,33 @@ ensure d11_hud
 
 d11_hud hides WHIP's status gauges and 3D rev dial and clips the minimap round. That is CSS inside whip_core's page,
 so d11_hud loads it as a WHIP theme when **no other theme** is active. Already running a theme (Config.Theme or a
-theme resource)? Add this line to your theme's `theme.css` and set `WhipLayer = false` in `config.lua`:
+theme resource)? Add these lines to your theme's `theme.css` and set `WhipLayer = false` in `config.lua`:
 
 ```css
-@import url('https://cfx-nui-d11_hud/whip/hud.css');
+@import url('https://cfx-nui-d11_hud/whip/hud.css');     /* rev dial hidden, round minimap */
+@import url('https://cfx-nui-d11_hud/whip/status.css');  /* WHIP's status gauges hidden, voice as a circle */
 ```
 
-The server console says so when it finds another theme.
+At start the server console says which way it went, in a `[d11_hud] WHIP layer ...` line, and each player gets the
+same line in F8 a few seconds after loading in.
+
+**Use WHIP's classic HUD skin** (`/whip` → Config → HUD skin: classic). The black skin draws a white frame round the
+minimap in the game itself, under the page, so no CSS can move it: it would stay empty at the bottom left.
+
+### Keeping WHIP's own health gauges
+
+Like WHIP's gauges better than d11_hud's pills? Set `Status = false` in `config.lua` and delete the `whip/status.css`
+line from `d11_hud/theme.css` (or don't import it into your theme). d11_hud then draws no health, armour, hunger or
+thirst, and WHIP's own gauges stay; the map, speedometer, turbo, nitrous, seatbelt, ammo and hints don't change.
+
+## Troubleshooting
+
+| What you see | Check |
+| --- | --- |
+| The ring is empty and WHIP's square minimap is still at the bottom left | The F8 or server `[d11_hud] WHIP layer` line. "off: the WHIP theme ... is active": add the two `@import` lines to that theme. "on" but still square: restart the client once (FiveM's NUI cache), and send us that line. |
+| An empty white frame at the bottom left | WHIP's black HUD skin: switch it to classic. |
+| WHIP's gauges show next to d11_hud's pills | `whip/status.css` is not loaded: see the line above. |
+| The turbo gauge reads a little differently from WHIP's own dial | Expected without the whip_core patch (below). |
 
 ## Configuration
 
@@ -50,6 +70,7 @@ The server console says so when it finds another theme.
 D11Hud = {
     SpeedUnit = 'mph',      -- 'mph' or 'kmh'
     Logo = false,           -- the D11 logo top-right (ui/logo.png: swap it for your own)
+    Status = true,          -- false: keep WHIP's own health gauges (see above)
     WhipLayer = true,       -- load whip/hud.css as a WHIP theme when no other theme is active
     Radar = true,           -- compass ring over the minimap
     Route = true,           -- GPS card next to it
