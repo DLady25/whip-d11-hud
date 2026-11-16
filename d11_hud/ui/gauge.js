@@ -1,5 +1,5 @@
 // The speedometer: RPM arc with a continuous fill, fuel on the outer right, nitrous as a thin arc inside the RPM one on
-// the left and turbo boost as its mirror on the right, with the psi under it. Aircraft use the same dial: heading in
+// the left and turbo boost as its mirror on the right, with the psi centred under the speed. Aircraft use the same dial: heading in
 // the gear circle, knots as the big number, altitude/AGL below, the horizon behind and the climb rate on the left arc.
 (() => {
     const root = document.getElementById('gauge');
@@ -42,7 +42,6 @@
     const fuelPath = arc(81, -34, 35);
     const nitroPath = arc(62, 140, 250);     // inside the RPM arc, from the same start
     const turboPath = arcBack(62, 40, -70);  // its mirror on the right, from the RPM arc's end
-    const boostAt = point(62, 64);           // the psi, under the turbo arc's start
     const vsTrack = arc(81, 146, 214);       // the fuel arc's mirror, left side
     const pitchLines = [-20, -10, 10, 20].map(p => {
         const y = 90 - p * 1.6, w = p % 20 ? 10 : 16;
@@ -72,7 +71,7 @@
             <g class="g-ticks">${ticks}</g>
             <g class="g-nitro-wrap"><path class="g-nitro-track" d="${nitroPath}"/><path class="g-nitro" d="${nitroPath}" pathLength="100" style="stroke-dasharray:0 100"/></g>
             <g class="g-turbo-wrap"><path class="g-turbo-track" d="${turboPath}"/><path class="g-turbo" d="${turboPath}" pathLength="100" style="stroke-dasharray:0 100"/>
-                <text class="g-boost" x="${boostAt[0] + 4}" y="${boostAt[1] + 9}"><tspan class="g-boost-n">0</tspan> <tspan>PSI</tspan></text></g>
+                <text class="g-boost" x="90" y="151"><tspan class="g-boost-n">0</tspan> <tspan>PSI</tspan></text></g>
             <g class="g-fuel-ring"><path class="g-fuel-track" d="${fuelPath}"/><path class="g-fuel" d="${fuelPath}" pathLength="100"/></g>
             <g class="g-vs-wrap"><path class="g-vs-track" d="${vsTrack}"/><path class="g-vs"/><line x1="6" x2="12" y1="90" y2="90" stroke="#ffffff80" stroke-width="1"/></g>
         </svg>
