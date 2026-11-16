@@ -1,0 +1,207 @@
+/* d11_hud tokens. */
+:root {
+    --ink: #EBF2ED;            /* status white */
+    --panel: rgba(16, 20, 25, .88);
+    --line: rgba(235, 242, 237, .16);
+    --accent: #009CE4;         /* the logo blue */
+    --talk: #a8d58d;
+    --radio: #62c8f2;
+    --crit: #ef655b;
+    --warn: #f7ca5c;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-size: 16px;
+    color: var(--ink);
+    user-select: none;
+}
+
+#hud { position: fixed; inset: 0; pointer-events: none; }
+#hud > .area { position: absolute; }
+
+/* hidden HUD and an open inventory hide everything; separate flags, so closing the inventory does not
+   undo a hidden HUD. */
+html.hud-hidden #hud,
+html.inventory-open #hud { visibility: hidden; }
+html.inactive #hud { visibility: hidden; }
+
+@font-face { font-family: D11Display; src: url('fonts/Quantico-Bold.ttf') format('truetype'); font-weight: 700; font-display: block; }
+@font-face { font-family: D11Text; src: url('fonts/Geist-Medium.woff2') format('woff2'); font-weight: 500; font-display: block; }
+
+@keyframes d12-pulse { 50% { opacity: .35; } }
+.low { animation: d12-pulse 1s ease-in-out infinite; }
+
+svg.ic { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- status ---------- */
+#status { left: 2rem; bottom: 2rem; }
+.st { display: flex; align-items: flex-start; gap: .5rem; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .55)); }
+
+/* voice: just the circle; its size is the range */
+.mic { position: relative; width: 2.1rem; height: 2.1rem; flex: none; color: var(--ink); }
+#voice { position: absolute; right: 2rem; bottom: 14.5rem; filter: drop-shadow(0 2px 4px #0009); }
+.radio-dot { position: absolute; right: -.7rem; top: -.15rem; width: .45rem; height: .45rem;
+    box-sizing: border-box; border: 1.5px solid #929ba4; border-radius: 50%; background: #101419b3; }
+.radio-dot[data-state="ready"], .radio-dot[data-state="transmitting"] { border-color: var(--radio); }
+.radio-dot[data-state="transmitting"] { background: var(--radio); box-shadow: 0 0 5px #62c8f299; }
+.radio-dot[data-state="muted"] { border-color: var(--crit); }
+.radio-dot[data-state="muted"]::after { content: ''; position: absolute; left: -2px; right: -2px; top: 50%;
+    height: 1.5px; background: var(--crit); transform: translateY(-50%) rotate(-45deg); }
+.mic svg.wave { position: absolute; inset: -.35rem; width: calc(100% + .7rem); height: calc(100% + .7rem); overflow: visible; fill: none; stroke-linejoin: round; }
+.mic .w1 { stroke: currentColor; stroke-width: 1.8; fill: var(--panel); }
+.mic .w2 { stroke: currentColor; stroke-width: 1.2; opacity: .35; }
+.mic .cut { stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.mic:not(.talk):not(.radio):not(.mute) .w1 { stroke-opacity: .5; }
+.mic.talk svg.wave, .mic.radio svg.wave { filter: drop-shadow(0 0 3px currentColor); }
+.mic.talk { color: var(--talk); }
+.mic.radio { color: var(--radio); }
+.mic.mute { color: var(--crit); }
+
+/* the pill is the bar itself; text with difference reads dark on the full part and light on the empty one */
+.pg { display: flex; flex-direction: column; align-items: center; gap: .22rem; }
+.pill { position: relative; width: 8.6rem; height: 2.1rem; padding: 0 .85rem 0 .35rem; box-sizing: border-box; border-radius: 99px; overflow: hidden; display: flex; align-items: center; gap: .45rem;
+    background: var(--panel); box-shadow: inset 0 0 0 1px var(--line), 0 3px 10px rgba(0, 0, 0, .45);
+    font: italic 700 1rem/1 D11Display, sans-serif; letter-spacing: .03em; text-transform: uppercase; color: #fff; }
+.pill .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; transform-origin: left; transition: transform .25s ease;
+    background: var(--pf, linear-gradient(180deg, #fafcfb 0%, #e3e9e5 100%)); box-shadow: inset 0 1px 0 #fff, inset -1px 0 0 rgba(0, 0, 0, .25); }
+.pill .lab { position: relative; display: flex; align-items: center; gap: .45rem; mix-blend-mode: difference; }
+.pill .bdg { width: 1.45rem; height: 1.45rem; display: grid; place-items: center; }
+.pill svg.ic { width: .95rem; height: .95rem; stroke-width: 2.3; }
+.pill .num { position: relative; margin-left: auto; padding-left: .5rem; font: 500 .62rem D11Text, sans-serif; font-variant-numeric: tabular-nums; mix-blend-mode: difference; opacity: .8; }
+.pill.crit { --pf: linear-gradient(180deg, #ff7a70, #e2483e); }
+.pill.crit .lab, .pill.crit .num { mix-blend-mode: normal; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
+.pill.empty { color: rgba(235, 242, 237, .45); }
+.pill.empty .lab { mix-blend-mode: normal; }
+
+/* hunger/thirst: a thin line under the pill and its icon just below */
+.sub { width: 100%; display: flex; flex-direction: column; align-items: center; gap: .28rem; color: var(--ink); filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .85)); }
+.sub.low { color: var(--crit); }
+.sub svg.ic { width: .95rem; height: .95rem; }
+.meter { width: 82%; height: .2rem; border-radius: 99px; background: rgba(235, 242, 237, .2); overflow: hidden; }
+.meter b { display: block; height: 100%; width: 100%; transform-origin: left; background: currentColor; box-shadow: 0 0 6px currentColor; transition: transform .2s linear; }
+
+/* contextual: orbs that fill from the bottom up */
+.orbs { display: flex; align-items: center; gap: .4rem; height: 2.1rem; margin-left: .1rem; }
+.orb { position: relative; width: 2.1rem; height: 2.1rem; flex: none; border-radius: 50%; overflow: hidden; color: var(--ink);
+    background: var(--panel); box-shadow: inset 0 0 0 .12rem rgba(235, 242, 237, .22); }
+.orb.low { color: var(--crit); }
+.orb .lvl { position: absolute; left: 0; right: 0; bottom: 0; background: currentColor; transition: height .2s linear; }
+.orb svg.ic { position: absolute; left: 50%; top: 50%; width: 1.1rem; height: 1.1rem; margin: -.55rem 0 0 -.55rem; color: #fff; mix-blend-mode: difference; }
+/* over red, difference would turn cyan: on alert the icon is plain white */
+.orb.low svg.ic { mix-blend-mode: normal; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .6)); }
+@keyframes orb-in { from { opacity: 0; transform: scale(.4); } }
+.orb.enter { animation: orb-in .25s ease-out; }
+
+@media (prefers-reduced-motion: reduce) { .low, .orb.enter { animation: none; } }
+
+/* ---------- speedometer ---------- */
+#gauge { right: 2rem; bottom: 1.5rem; }
+.gauge { position: relative; width: 14.5rem; height: 12rem; color: #f1f3f5; font-family: D11Display, sans-serif; font-weight: 700; filter: drop-shadow(0 1px 2px #0009); }
+.gauge[hidden], .g-ind > span[hidden], .g-fuel-icon[hidden] { display: none; }
+.g-dial { position: absolute; left: 0; top: 0; width: 12rem; height: 12rem; overflow: visible; fill: none; }
+.g-inner { stroke: #ffffff12; stroke-width: 1; }
+.g-back { fill: #10141966; }
+.g-rpm-track { stroke: #ffffff28; stroke-width: 4; }
+.g-rpm { stroke-width: 4; }
+.g-reveal { transition: stroke-dasharray 100ms linear; }
+.electric .g-rpm { stroke: #38d6e8 !important; }
+.g-ticks { stroke: #15181dc9; stroke-width: 7; }
+.g-fuel-track { stroke: #ffffff25; stroke-width: 5; }
+.g-fuel { stroke: var(--fuel-color, #edf1f4); stroke-width: 5; transition: stroke-dasharray 200ms linear, stroke 200ms linear; }
+/* nitrous: a thin arc inside the RPM one, on the left; turbo: the same on the right */
+.g-nitro-track { stroke: #ffffff12; stroke-width: 3; }
+.g-nitro { stroke: #38c4ea; stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 2px #38c4eaaa); transition: stroke-dasharray 120ms linear, stroke 120ms linear; }
+.g-nitro.burst { stroke: #9feeff; filter: drop-shadow(0 0 4px #62d8ff); }
+.g-turbo-track { stroke: #ffffff12; stroke-width: 3; }
+.g-turbo { stroke: #f7ca5c; stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 2px #f7ca5caa); transition: stroke-dasharray 120ms linear; }
+.g-turbo.full { stroke: #ffe08a; filter: drop-shadow(0 0 4px #f7ca5c); }
+.g-boost { fill: #f1f3f5; font-size: 12px; font-style: italic; font-variant-numeric: tabular-nums; text-anchor: middle; }
+.g-boost tspan + tspan { font-size: 6.5px; letter-spacing: .1em; fill-opacity: .6; font-style: normal; }
+@media (prefers-reduced-motion: reduce) { .g-turbo { transition: none; } }
+.g-readout { position: absolute; top: 2.1rem; left: 0; width: 12rem; display: flex; flex-direction: column; align-items: center; }
+.g-gear { display: grid; place-items: center; width: 1.85rem; height: 1.85rem; border: 1px solid #edf1f4; border-radius: 50%; font-size: 1.02rem; font-style: italic; }
+.g-gear-label { font-size: .45rem; letter-spacing: .13em; opacity: .55; margin-top: .18rem; }
+.g-speed { font-size: 2.85rem; font-style: italic; line-height: 1.15; letter-spacing: -.06em; font-variant-numeric: tabular-nums; margin-top: .2rem; transform: scaleX(.8); }
+.g-unit { font-size: .6rem; letter-spacing: .11em; line-height: 1; }
+.g-fuel-icon { position: absolute; top: 5.35rem; left: 11.55rem; color: var(--fuel-color, #edf1f4); transition: color 200ms linear; }
+@keyframes g-blink { 50% { opacity: .2; } }
+.fuel-low .g-fuel, .fuel-low .g-fuel-icon { animation: g-blink 1.2s ease-in-out infinite; }
+svg.gi { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.g-ind { position: absolute; top: 1.6rem; bottom: .5rem; right: 0; display: flex; flex-direction: column; justify-content: center; gap: .35rem; }
+.g-ind > span { width: 1.7rem; min-height: 1.65rem; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: #10141970; color: #ffffff55; }
+.g-ind > .on { color: #eef2f5; }
+.g-ind > .warning { color: #e9978e; }
+.g-ind > .blue { color: #7dc8ec; }
+.g-ind > [data-i="engine"] { color: var(--engine-color, #edf1f4); transition: color 200ms linear; }
+.g-ind .unlocked .shackle { transform: translateY(-2px) rotate(-24deg); transform-origin: 8px 10px; }
+.g-meter { width: .8rem; height: 2px; margin-top: .15rem; background: linear-gradient(to right, currentColor calc(var(--level, 0) * 100%), #ffffff20 0); }
+@media (prefers-reduced-motion: reduce) { .g-reveal, .g-fuel, .g-nitro, .g-fuel-icon { transition: none; } .fuel-low .g-fuel, .fuel-low .g-fuel-icon { animation: none; } }
+
+/* ---------- logo (D11Hud.Logo) ---------- */
+#brand { top: .5rem; right: 2rem; width: clamp(88px, 7vw, 132px); filter: drop-shadow(0 2px 3px #0008); }
+#brand[hidden] { display: none; }
+#brand img { display: block; width: 100%; height: auto; }
+
+/* ---------- radar ring ----------
+   In vh because the minimap scales with the screen height. Change together with #minimap3d in ../whip/hud.css:
+   the centre and the size must match. */
+#radar { left: 3.15vh; top: 2.45vh; width: 16.69vh; height: 16.69vh; }
+#radar[hidden] { display: none; }
+.r-ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.r-band { fill: none; stroke: url(#r-fade); }
+.r-edge { fill: none; stroke: var(--line); stroke-width: 1; }
+.r-dial { filter: drop-shadow(0 1px 2px #000) drop-shadow(0 0 2px #000a); }
+.r-dial line { stroke: var(--ink); stroke-width: 1; opacity: .9; }
+.r-dial line.major { stroke-width: 1.6; }
+.r-dial line.north { stroke: var(--accent); stroke-width: 2.4; opacity: 1; }
+.r-dial text { fill: var(--ink); text-anchor: middle; dominant-baseline: central; font-family: D11Text, sans-serif; }
+.r-dial .card { font: italic 700 15px D11Display, sans-serif; }
+.r-dial .inter { font-size: 9.5px; opacity: .85; }
+.r-dial .north { fill: var(--accent); }
+.r-pointer { fill: var(--ink); stroke: #101419; stroke-width: 1; }
+.r-deg { position: absolute; left: 50%; bottom: -.22vh; transform: translateX(-50%); padding: .26vh .72vh .26vh .78vh; border-radius: 99px; white-space: nowrap;
+    background: rgba(16, 20, 25, .94); box-shadow: inset 0 0 0 1px var(--line), 0 2px 6px #0007;
+    font: italic 700 .85vh/1 D11Display, sans-serif; font-variant-numeric: tabular-nums; color: var(--ink); }
+.r-deg i { font-style: inherit; color: var(--accent); margin-left: .33vh; }
+.r-under { position: absolute; left: 50%; top: calc(100% + .78vh); transform: translateX(-50%); width: 22vh; text-align: center;
+    font: italic 700 .98vh/1.25 D11Display, sans-serif; letter-spacing: .03em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 3px #000, 0 0 2px #000; }
+.r-under span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.r-under span:empty { display: none; }
+
+/* GPS card: its left side is cut on the ring's radius, around the same centre as #radar */
+#route { left: 17vh; top: 14.9vh; filter: drop-shadow(0 2px 3px #0007); }
+.r-card { display: flex; align-items: center; gap: .55vh; height: 2.5vh; padding: 0 .95vh 0 2.8vh; box-sizing: border-box; border-radius: 0 .4vh .4vh 0;
+    background: var(--ink); color: #101419; font: italic 700 1.2vh/1 D11Display, sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap;
+    -webkit-mask-image: radial-gradient(circle 8.8vh at -5.505vh -4.105vh, transparent 99.3%, #000 100%); }
+#route[hidden] { display: none; }
+#route svg.ic { width: 1.5vh; height: 1.5vh; stroke-width: 2.6; }
+#route small { margin-left: -.2vh; font-size: .95vh; opacity: .75; }
+#route small[hidden] { display: none; }
+
+/* ---------- speedometer: aircraft ---------- */
+.gauge:not(.air) .g-horizon, .gauge:not(.air) .g-vs-wrap, .gauge:not(.air) .g-vs-icon { display: none; }
+.g-vs-track { stroke: #ffffff25; stroke-width: 5; }
+.g-vs { stroke: var(--vs-color, #62c8f2); stroke-width: 5; }
+.g-vs-icon { position: absolute; top: 5.35rem; left: -1.05rem; color: var(--vs-color, #62c8f2); }
+.air .g-gear { font-size: .78rem; }
+.g-alt { margin-top: .42rem; font-size: .62rem; letter-spacing: .08em; font-variant-numeric: tabular-nums; opacity: .85; white-space: nowrap; }
+.g-alt b { font-size: .8rem; font-style: italic; letter-spacing: 0; }
+.g-alt i { font-style: normal; opacity: .55; }
+.g-ind > .alarm { color: var(--crit); animation: g-blink .7s ease-in-out infinite; }
+.g-warn { position: absolute; left: 0; width: 12rem; bottom: -.4rem; text-align: center; }
+.g-warn span { display: inline-block; font: italic 700 .7rem/1 D11Display, sans-serif; letter-spacing: .14em; padding: .25rem .6rem; border-radius: 99px; background: var(--crit); color: #fff; animation: g-blink .7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .g-ind > .alarm, .g-warn span { animation: none; } }
+
+/* ---------- action hints, bottom-right corner ---------- */
+#hints { right: 2rem; bottom: 1.6rem; display: grid; justify-items: end; gap: .3em; width: max-content; max-width: min(28vw, 360px);
+    color: #f2f2f2; font: 600 14px/1.25 Arial, sans-serif; }
+#hints:empty { display: none; }
+#hints .hint { display: flex; align-items: center; justify-content: flex-end; gap: .45em; max-width: 100%; padding: .12em .2em; background: rgba(0, 0, 0, .18); }
+#hints .hint span { text-align: right; overflow-wrap: anywhere; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+#hints kbd { flex-shrink: 0; min-width: 1.65em; padding: .12em .4em; background: #e8e8e8; color: #151515; border-radius: 1px;
+    font: 700 .95em/1.2 Arial, sans-serif; text-align: center; text-shadow: none; }

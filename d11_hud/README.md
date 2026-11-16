@@ -1,0 +1,112 @@
+# D11 HUD for WHIP
+
+The HUD we run on District 11 (D11), for [WHIP](https://github.com/WHIPFX/whip_core). It draws in its own page and
+reads everything from whip_core's exports and stats: no framework bridge, no SQL.
+
+> **English and Brazilian Portuguese.** One line in server.cfg picks the language of every D11 resource:
+> `setr d11_locale en` (the default) or `setr d11_locale pt-BR`.
+
+## What's inside
+
+| Part | What it does |
+| --- | --- |
+| **Status** | Health and armour pills with hunger and thirst lines under them; stress, energy and oxygen orbs that show only when they matter. |
+| **Speedometer** | Speed (mph or km/h), gear, RPM arc, fuel (or charge on an electric car), engine health, lights, locks and seatbelt. Aircraft get heading, knots, altitude, AGL, climb rate and an artificial horizon. |
+| **Turbo gauge** | For cars with a [whip_autos](https://github.com/WHIPFX/whip_autos) turbo: an arc inside the RPM one, filled up to the stage's full boost, and the boost in psi. Only shows when a turbo is fitted. |
+| **Nitrous gauge** | For cars with a whip_autos nitrous bottle: the mirror arc on the left, how much is left, bright while it burns. Only shows when a bottle is fitted. |
+| **Seatbelt** | **B** buckles up (players rebind it in Settings > Key Bindings > FiveM). Unbuckled, a crash above 20 km/h throws you through the windscreen (160 km/h buckled); buckled, you can't leave the car until you unbuckle. Passengers get a small belt icon. `LocalPlayer.state.seatbelt` is there for other scripts. |
+| **Radar** | A round compass ring over WHIP's minimap (clipped round), the heading in degrees, area and street. |
+| **GPS card** | Next to the ring: the next turn, read off the GPS line itself, the distance to it and the distance left. |
+| **Ammo** | Rounds in the weapon, spare magazines and the weapon's silhouette with its attachments, from [whip_gunny](https://github.com/WHIPFX/whip_gunny) (`GetDrawnWeapon` and its own catalogue). GTA's ammo without gunny. |
+| **Action hints** | The keys that matter right now, in the bottom-right corner (seatbelt, engine, cancel an emote). `/hints on\|off\|bigger\|smaller` (`/legendas` in pt-BR). Other scripts can add theirs. |
+| **Low fuel** | A WHIP notification when the tank is at 20% or less. |
+
+WHIP's own voice gauge stays (only whip_core knows when the player talks), as a small circle above the speedometer.
+
+## Installation
+
+Put `d11_hud` in your `resources` folder and add, after the `ensure whip_*` lines:
+
+```cfg
+setr d11_locale en
+ensure d11_hud
+```
+
+d11_hud hides WHIP's status gauges and 3D rev dial and clips the minimap round. That is CSS inside whip_core's page,
+so d11_hud loads it as a WHIP theme when **no other theme** is active. Already running a theme (Config.Theme or a
+theme resource)? Add this line to your theme's `theme.css` and set `WhipLayer = false` in `config.lua`:
+
+```css
+@import url('https://cfx-nui-d11_hud/whip/hud.css');
+```
+
+The server console says so when it finds another theme.
+
+## Configuration
+
+`d11_hud/config.lua`:
+
+```lua
+D11Hud = {
+    SpeedUnit = 'mph',      -- 'mph' or 'kmh'
+    Logo = false,           -- the D11 logo top-right (ui/logo.png: swap it for your own)
+    WhipLayer = true,       -- load whip/hud.css as a WHIP theme when no other theme is active
+    Radar = true,           -- compass ring over the minimap
+    Route = true,           -- GPS card next to it
+    MapDefaults = true,     -- once per PC: minimap on foot too, 25% less zoom in a vehicle
+    Ammo = true,
+    Turbo = true,
+    Nitro = true,
+    Seatbelt = { Enabled = true, Key = 'B', EjectKmh = 20, EjectBuckledKmh = 160 },
+    Hints = { Enabled = true, Command = 'hints' },
+    LowFuel = { Enabled = true, Threshold = 20, RepeatSeconds = 60 },
+    Stamina = false,        -- or { resource = 'my_movement', export = 'GetStamina' } (0-100) for the energy orb
+}
+```
+
+## Turbo and nitrous
+
+whip_autos keeps both as whip_core vehicle stats (`boost` and `nitro`), so d11_hud needs nothing from whip_autos
+itself. The driver's **live** boost, though, is a number whip_autos hands only to whip_core's own gauge, and whip_core
+has no export for it. Two ways:
+
+- **With the patch** in `whip_core-patches/` (one export, `GetVehicleStatReading`, read only): the turbo gauge shows
+  exactly what whip_autos simulates, the same psi WHIP's own dial would show, and nitrous drains smoothly.
+- **Without it** it still works: the nitrous arc follows the bottle as whip_core holds it (a step behind while it
+  burns), and the turbo arc follows GTA's own turbo part, which whip_autos fits with every stage, scaled to the
+  stage's psi: the same spool and blow-off, not the same number. With a passenger in the car it is exact either way.
+
+```
+cd resources
+patch -p1 < whip_core-vehicle-stat-reading-d11.patch
+```
+
+Restart whip_core after applying it.
+
+## For developers
+
+```lua
+-- action hints, client side: up to six rows, priority 0-100 (default 50); cleared when your resource stops
+exports.d11_hud:SetHints('vehicle-access', {
+    { key = 'E', label = 'Open the boot' },
+    { command = 'my_command', label = 'Do the thing' },   -- shows the key the player bound
+}, 60)
+exports.d11_hud:ClearHints('vehicle-access')
+```
+
+Texts are in `ui/locales.js` (the Portuguese text is the key; one map per language) and in the Lua files as
+`L(english, portuguese)`.
+
+## Requirements
+
+- whip_core 1.0.1 or newer.
+- Optional: whip_autos (turbo and nitrous), whip_gunny (ammo), whip_fuel (fuel).
+
+## License
+
+MIT (see `LICENSE`). `whip_core-patches/` changes whip_core and is under whip_core's own license (LGPL-3.0).
+
+## Credits
+
+- Fonts in `ui/fonts`: Quantico (Andrea Herstowski) and Geist (Vercel), both under the SIL Open Font License.
+- Built on WHIP by Whippy and the WHIP contributors.

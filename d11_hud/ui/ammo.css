@@ -1,0 +1,33 @@
+/* Weapon and ammo: bottom-right corner; in a vehicle it moves left of the speedometer. */
+#ammo {
+    position: absolute;
+    bottom: 2.2rem;
+    right: 5.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .1rem;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(.3rem);
+    transition: opacity .15s ease-out, transform .15s ease-out;
+    font-family: D11Text, 'Segoe UI', sans-serif;
+}
+#ammo.visible { opacity: 1; transform: translateY(0); }
+#ammo.in-vehicle { right: 22rem; }
+#ammo .mag { display: flex; align-items: center; gap: .3rem; margin-right: .6rem; opacity: .65; }
+#ammo .ammo-line { display: flex; align-items: center; }
+#ammo.melee .ammo-line { display: none; }
+#ammo .weapon-silhouette { position: relative; width: 7.5rem; height: 2.8125rem; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .85)); }
+#ammo .weapon-silhouette:empty { display: none; }
+#ammo .weapon-silhouette img { position: absolute; inset: 0; width: 100%; height: 100%; }
+#ammo .mag-icon { position: relative; width: .65rem; height: .9rem; }
+#ammo .mag-icon svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#ammo .mag-outline { stroke: rgba(255, 255, 255, .45); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+#ammo .mag-fill { fill: #fff; clip-path: inset(100% 0 0 0); transition: clip-path .2s ease-out; }
+#ammo .spare { font-size: .8rem; font-weight: 600; color: rgba(255, 255, 255, .55); }
+#ammo .rounds { display: flex; align-items: baseline; gap: .25rem; font-style: italic; font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0, 0, 0, .8); }
+#ammo .current { font-size: 1.65rem; font-weight: 800; color: #fff; letter-spacing: .01em; }
+#ammo .sep { font-size: .9rem; font-weight: 400; color: rgba(255, 255, 255, .3); }
+#ammo .capacity { font-size: .9rem; font-weight: 400; color: rgba(255, 255, 255, .55); }
+#ammo .current.empty, #ammo .spare.empty { color: #ef4444; }

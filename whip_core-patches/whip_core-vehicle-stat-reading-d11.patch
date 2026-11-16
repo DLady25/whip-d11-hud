@@ -1,0 +1,27 @@
+d11_hud: optional whip_core patch (whip_core-vehicle-stat-reading-d11).
+Adds exports.whip_core:GetVehicleStatReading(name, { entity = veh }): this client's live gauge reading for a vehicle stat,
+the number whip_core's own capsule draws (whip_autos' turbo boost and nitrous for the driver). Read only.
+Made on whip_core 1.0.1; applies to 1.1.0. From resources/: patch -p1 < whip_core-vehicle-stat-reading-d11.patch
+This patch changes whip_core and is under whip_core's license (LGPL-3.0).
+
+--- a/whip_core/client/vehicles.lua
++++ b/whip_core/client/vehicles.lua
+@@ -296,6 +296,18 @@
+     return tonumber(value)
+ end
+ 
++--- This client's gauge reading for a stat on a car, as its own capsule draws it: a watcher's live reading (what its
++--- whileHeld last returned, e.g. whip_autos' boost and nitro for the driver), else the SetVehicleStatDisplay provider,
++--- else nil. Read only, for HUD resources that draw the gauge themselves (d11_hud). Patch: whip_core-vehicle-stat-reading-d11.
++---@param name string
++---@param vehicle WhipVehicleRef  `{ entity = veh }`
++---@return number|nil
++exports('GetVehicleStatReading', function(name, vehicle)
++    local entity = type(vehicle) == 'table' and tonumber(vehicle.entity) or nil
++    if type(name) ~= 'string' or not entity or not DoesEntityExist(entity) then return nil end
++    return readVehicleStatDisplay(name, entity, nil)
++end)
++
+ --- Whether a stat's gauge is drawn on a car, by a resource's rule (SetVehicleStatShown), e.g. no fuel gauge on an
+ --- electric car. [statName] = { fn = function(entity) -> false to hide }.
+ local _statShown = {}

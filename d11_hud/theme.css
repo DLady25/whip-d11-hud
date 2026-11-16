@@ -1,0 +1,3 @@
+/* d11_hud as a WHIP theme (server.lua: only when no other theme is active). Only the HUD layer, no tokens:
+   WHIP's menus, inventory and notifications keep their own look. ?v=N: FiveM's NUI caches CSS by its address. */
+@import url('whip/hud.css?v=1');

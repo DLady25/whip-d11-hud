@@ -1,0 +1,142 @@
+/* ========================================
+   d11_hud inside whip_core's page (WHIP's own HUD).
+   d11_hud draws status, speedometer and the radar ring in its own page; this only makes room for it:
+     - hides WHIP's status gauges (health, armour, hunger, thirst, oxygen...) and its 3D rev dial (#vehicleDial);
+     - keeps WHIP's capsule for chat and notifications only, above d11_hud's status pills;
+     - dresses WHIP's voice gauge as a single circle (only whip_core knows when the player talks), on the right,
+       above the speedometer;
+     - clips WHIP's minimap round, under d11_hud's radar ring.
+   Loaded as a WHIP theme by d11_hud (theme.css) when no other theme is active; from your own theme:
+     @import url('https://cfx-nui-d11_hud/whip/hud.css');
+   Works with both WHIP HUD skins (Config.HudSkin classic and 'black'): ':not(.d11-off)' weighs the same as
+   '.skin-black', so these rules tie with hud-skin.css and win by coming later.
+   ======================================== */
+
+#status-hud {
+    /* d11_hud's 1rem (16px) undoing #status-hud's zoom (--ui-scale x 1.25) */
+    --d11-u: calc(16px / (var(--ui-scale) * 1.25));
+    --d11-ink: #EBF2ED;
+    --d11-panel: rgba(16, 20, 25, 0.88);
+    --d11-line: rgba(235, 242, 237, 0.16);
+    --d11-talk: #a8d58d;
+    --d11-radio: #62c8f2;
+}
+
+/* ---------- WHIP's 3D rev dial: d11_hud's speedometer replaces it ---------- */
+#vehicleDial { display: none !important; }
+
+/* ---------- WHIP's gauges: only the voice stays ---------- */
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat:not([data-stat="voice"]) { display: none !important; }
+
+/* the empty capsule disappears; with chat or a notification it becomes a dark card above the status pills */
+/* !important: on the black skin status-hud.js writes left/bottom inline (gauges under the radar frame) */
+#status-hud:not(.d11-off) #statusHudWrapper { left: calc(2 * var(--d11-u)) !important; bottom: calc(6.6 * var(--d11-u)) !important; }
+#status-hud:not(.d11-off) #statusHudContainer.mode-stats {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+#status-hud:not(.d11-off) #statusHudContainer::before { display: none; }
+#status-hud:not(.d11-off) #statusHudContainer:not(.mode-stats) {
+    --sh-ring-size: calc(2.6 * var(--d11-u));
+    background: var(--d11-panel);
+    border: 0;
+    box-shadow: inset 0 0 0 1px var(--d11-line), 0 3px 10px rgba(0, 0, 0, 0.45);
+}
+#status-hud:not(.d11-off) #capsuleBubble::after { border-color: transparent; box-shadow: none; }
+#status-hud:not(.d11-off) #capsuleBubble .sh-disc { inset: 3px; }
+#status-hud:not(.d11-off) #capsuleBubble .sh-disc::before { box-shadow: none; }
+#status-hud:not(.d11-off) #capsuleBubble .sh-icon { color: #101419; }
+#status-hud #capsuleNotifyText { font-family: var(--ui-font); color: var(--d11-ink); text-shadow: none; }
+#status-hud #capsuleInput { font-family: var(--ui-font); color: var(--d11-ink); caret-color: var(--ui-accent); }
+
+/* ---------- voice: one circle, its size is the range ----------
+   right 2rem, bottom 14.5rem; WHIP sends the range as --sh-p 20/50/100 (whisper/normal/shout). */
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"] {
+    position: fixed;
+    right: calc(2 * var(--d11-u));
+    bottom: calc(14.5 * var(--d11-u));
+    width: calc(2.1 * var(--d11-u)) !important;
+    height: calc(2.1 * var(--d11-u));
+    margin: 0 !important;
+    opacity: 1 !important;
+    transform: none !important;
+    overflow: visible;
+    animation: none;
+    color: var(--d11-ink);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    /* the circle's diameter: 1.23 / 1.74 / 2.24 rem */
+    --d11-mic: calc(var(--d11-u) * min(0.9 + 0.0168 * var(--sh-p, 50), 2.24));
+}
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"]::before,
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"] .sh-icon,
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"] .sh-fill,
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"] .sh-disc::before { display: none; }
+/* the circle: a thin outline over the panel, dimmed while silent */
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"] .sh-disc {
+    inset: auto;
+    left: 50%;
+    top: 50%;
+    width: var(--d11-mic);
+    height: var(--d11-mic);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    overflow: visible;
+    background: var(--d11-panel);
+    box-shadow: inset 0 0 0 calc(0.1 * var(--d11-u)) rgba(235, 242, 237, 0.5);
+    transition: width 0.3s ease, height 0.3s ease, box-shadow 0.08s ease;
+}
+/* the wave: a faint ring outside that breathes while talking */
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"]::after {
+    inset: auto;
+    left: 50%;
+    top: 50%;
+    width: var(--d11-mic);
+    height: var(--d11-mic);
+    transform: translate(-50%, -50%);
+    border: calc(0.07 * var(--d11-u)) solid currentColor;
+    border-radius: 50%;
+    box-shadow: none;
+    background: none;          /* the black skin's conic rim */
+    -webkit-mask: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"].talking { color: var(--d11-talk); }
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"].talking.radio { color: var(--d11-radio); }
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"].talking .sh-disc {
+    box-shadow: inset 0 0 0 calc(0.1 * var(--d11-u)) currentColor, 0 0 3px currentColor;
+}
+#status-hud:not(.d11-off) #statusHudStats > .sh-stat[data-stat="voice"].talking::after {
+    opacity: 0.35;
+    animation: d11-voice-wave 0.9s ease-in-out infinite;
+}
+@keyframes d11-voice-wave {
+    0%, 100% { transform: translate(-50%, -50%) scale(1.05); }
+    35%      { transform: translate(-50%, -50%) scale(1.22); }
+    60%      { transform: translate(-50%, -50%) scale(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    #status-hud #statusHudStats > .sh-stat[data-stat="voice"].talking::after { animation: none; }
+}
+
+/* ---------- round minimap under the radar ring ----------
+   The map is WHIP's (#minimap3d: minimap.js places and sizes it in px from hud_skin.lua's box). It moves to the
+   top-left corner, centred on d11_hud's ring (#radar: left 3.15vh, top 2.45vh, 16.69vh), and is clipped to a circle
+   the size of the ring's map (radius 110 of 128 in its 256 viewBox = 7.17vh). The box keeps its size, so the map does
+   not stretch: the centre comes from translate(-50%, -50%) on the box itself (left/top beat the inline style).
+   No white frame and no WHIP "N": the ring's compass does that. */
+#minimap3d {
+    left: calc(3.15vh + 16.69vh / 2) !important;
+    top: calc(2.45vh + 16.69vh / 2) !important;
+    transform: translate(-50%, -50%);
+    clip-path: circle(7.17vh at 50% 50%);
+    border-radius: 0;
+    box-shadow: none !important;
+}
+#minimap3d .mm-north { display: none; }
+/* inventory open: the map goes (d11_hud's ring already hides with any WHIP screen). #minimap3d is the body's last
+   child; a custom renderer uses #inv-custom-root (hidden when closed; empty without a renderer), WHIP's own
+   #inv-overlay.open. */
+#inv-custom-root:not([hidden]):not(:empty) ~ #minimap3d,
+#inv-overlay.open ~ #minimap3d { opacity: 0 !important; transition: opacity .15s ease; }
