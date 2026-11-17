@@ -29,7 +29,14 @@ Whip.register(function()
         return
     end
     if theme == 'd11_theme' then
-        report(true, 'WHIP layer on: through d11_theme, which imports whip/hud.css and whip/status.css.')
+        -- d11_theme 1.0.1 ships the two @import lines commented out (a failed import drops the whole theme)
+        local css = LoadResourceFile('d11_theme', 'theme.css') or ''
+        if ("\n" .. css):find("\n@import url%('https://cfx%-nui%-" .. SELF .. "/whip/hud%.css") then
+            report(true, 'WHIP layer on: through d11_theme, which imports whip/hud.css and whip/status.css.')
+        else
+            report(false, ('WHIP layer off: d11_theme is the active WHIP theme but does not import it yet. Uncomment the two d11_hud lines at the top of d11_theme/theme.css (or add %s there).')
+                :format(IMPORT))
+        end
         return
     end
     if theme == 'whip_theme_d12' then
