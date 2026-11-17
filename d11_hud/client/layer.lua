@@ -15,9 +15,11 @@ local function check()
         return
     end
     print(('%s[d11_hud] %s^0'):format(layer.on and '^2' or '^3', tostring(layer.text)))
-    if layer.on and pageTheme ~= SELF then
-        print('^3[d11_hud] whip_core\'s page had not been sent the layer: sending it again^0')
-        TriggerEvent('whip_core:client:applyTheme', SELF)
+    -- The theme that carries the layer: d11_hud itself, or d11_theme (1.0.4 sent d11_hud over d11_theme here).
+    local theme = layer.theme or SELF
+    if layer.on and pageTheme ~= theme then
+        print(('^3[d11_hud] whip_core\'s page had not been sent the theme %s: sending it again^0'):format(theme))
+        TriggerEvent('whip_core:client:applyTheme', theme)
     end
 end
 

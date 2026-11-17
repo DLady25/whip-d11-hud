@@ -11,7 +11,7 @@ D11Hud = {
     SpeedUnit = 'mph',      -- 'mph' or 'kmh'
     Logo = false,           -- the D11 logo in the top-right corner (ui/logo.png: swap it for your own)
     Status = true,          -- d11_hud's health/armour pills and stress/energy/oxygen orbs. false keeps WHIP's own
-                            -- gauges instead: also delete the whip/status.css line from theme.css (README)
+                            -- gauges instead (the layer leaves them by itself)
 
     -- WHIP's own HUD: d11_hud hides WHIP's status gauges and 3D rev dial (it draws its own), keeps WHIP's voice
     -- gauge as a small circle and clips WHIP's minimap round under the radar ring. That is CSS inside whip_core's

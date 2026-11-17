@@ -41,8 +41,9 @@ theme resource)? Add these lines to your theme's `theme.css` and set `WhipLayer 
 @import url('https://cfx-nui-d11_hud/whip/status.css');  /* WHIP's status gauges hidden, voice as a circle */
 ```
 
-Running [d11_theme](https://github.com/DLady25/whip-d11-theme), our WHIP theme? Uncomment the two d11_hud lines at the
-top of its `theme.css` (1.0.1 ships them commented out, so the theme still loads without d11_hud). The old `whip_theme_d12` from the D11 Starter Kit does not round the minimap: replace it with d11_theme.
+Running [d11_theme](https://github.com/DLady25/whip-d11-theme) 1.1.0, our WHIP theme? Nothing to edit: the theme takes
+d11_hud's layer while d11_hud runs and drops it when d11_hud stops. The old `whip_theme_d12` from the D11 Starter
+Kit does not round the minimap: replace it with d11_theme.
 
 At start the server console says which way it went, in a `[d11_hud] WHIP layer ...` line, and each player gets the
 same line in F8 a few seconds after loading in.
@@ -52,8 +53,8 @@ minimap in the game itself, under the page, so no CSS can move it: it would stay
 
 ### Keeping WHIP's own health gauges
 
-Like WHIP's gauges better than d11_hud's pills? Set `Status = false` in `config.lua` and delete the `whip/status.css`
-line from `d11_hud/theme.css` (or don't import it into your theme). d11_hud then draws no health, armour, hunger or
+Like WHIP's gauges better than d11_hud's pills? Set `Status = false` in `config.lua` (with your own theme, also don't
+import `whip/status.css` into it). d11_hud then draws no health, armour, hunger or
 thirst, and WHIP's own gauges stay; the map, speedometer, turbo, nitrous, seatbelt, ammo and hints don't change.
 
 ## Troubleshooting

@@ -5,7 +5,7 @@ lua54 'yes'
 name 'd11_hud'
 description 'D11 HUD for WHIP: status, speedometer with turbo and nitrous, seatbelt, round radar with GPS card, ammo, action hints.'
 author 'District 11 (D11)'
-version '1.0.4'
+version '1.1.0'
 repository 'https://github.com/DLady25/whip-d11-hud'
 
 dependency 'whip_core'
@@ -37,6 +37,7 @@ files {
     'theme.css',            -- the WHIP layer, injected into whip_core's page (server.lua)
     'whip/hud.css',
     'whip/status.css',
+    'whip/status-layer.css',
     'ui/index.html',
     'ui/*.css',
     'ui/*.js',
