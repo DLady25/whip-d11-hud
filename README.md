@@ -1,5 +1,8 @@
 # D11 HUD for WHIP
 
+> **Installing?** Follow [INSTALL.md](INSTALL.md) (English and Português): the whole D11 set on a stock whip_core
+> 1.2.0, step by step, with the patch order, server.cfg and what to check in the console.
+
 The HUD we run on District 11 (D11), for [WHIP](https://github.com/WHIPFX/whip_core). It draws in its own page and
 reads everything from whip_core's exports and stats: no framework bridge, no SQL.
 
